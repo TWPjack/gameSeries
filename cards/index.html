@@ -120,6 +120,14 @@
           $('.card').eq(target).insertAfter($('.card').eq(i))
         }
 
+        setTimeout(() => {
+          $('.card').removeClass('close')
+        }, 1500);
+
+        setTimeout(() => {
+          $('.card').addClass('close')
+        }, 4500);
+
         let timer = setInterval(function () {
           timeleft--
           $('#text-time').text(timeleft)
