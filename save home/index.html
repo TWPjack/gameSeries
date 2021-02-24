@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拯救家園</title>
+  <style>
+    html,
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background-color: black;
+    }
+
+    .title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: aliceblue;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: aquamarine;
+
+    }
+
+    #game {
+      width: 90vw;
+      height: 80vh;
+      background: url(./images/cemetery.jpg);
+      overflow: hidden;
+      position: relative;
+      cursor: url(./images/cursor_white.png) 50 50, auto;
+      /* cursor: grab; */
+    }
+
+    #game img {
+      position: absolute;
+      height: 150px;
+      z-index: 5;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+    }
+
+    .button {
+      width: 70px;
+      height: 30px;
+      margin: .3rem;
+    }
+
+    .inf {
+      display: flex;
+      flex-direction: row;
+      display: none;
+    }
+
+    .house {
+      width: 200px;
+      height: 50vh;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: blue;
+      clip-path: polygon(54% 0%, 0% 35%, 0% 99%, 97% 100%, 98% 40%);
+      z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="game">
+      <div class="title">拯救家園</div>
+      <div class="house"></div>
+    </div>
+    <div class="panel">
+      <input class="button" type="button" value="開始遊戲" id="btn-start">
+      <input class="button" type="button" value="結束遊戲" id="btn-stop">
+      <div class="inf">
+        <div>分數: <span id="text-score">0</span> 分</div>
+        <div>剩餘: <span id="text-time">30</span> 秒</div>
+      </div>
+    </div>
+  </div>
+  <script src="./js/jquery-3.5.1.js"></script>
+  <script>
+    let score = 0
+    let timeleft = 50
+    let playing = false
+    let stopButtonStatus = false
+    // 殭屍流水號
+    let id = 0
+
+    const rand = (num) => {
+      return Math.floor(Math.random() * num)
+    }
+
+    // const movezombie = (id) => {
+    //   $(`#zombie${id}`).animate({
+    //     right: 90 + '%'
+    //   }, 1000, function () {
+    //     movezombie(id)
+    //   })
+    // }
+
+    const movezombie = (id) => {
+      $(`#zombie${id}`).animate({
+        right: 80 + '%'
+      }, 10000, function () {
+        $(`#zombie${id}`).attr('src', './images/smog.png')
+        score--
+        $('#text-score').text(score)
+        setTimeout(() => {
+          $(`#zombie${id}`).remove()
+        }, 500)
+      })
+    }
+
+    $('#btn-start').click(function () {
+      // 停用開始按鈕
+      $(this).attr('disabled', true)
+      playing = true
+      // 重設
+      score = 0
+      $('#text-score').text(score)
+      timeleft = 30
+      $('#text-time').text(timeleft)
+      $('.inf').show()
+      $('#btn-stop').show()
+
+      let timer = setInterval(function () {
+        // 修改秒數
+        timeleft--
+        $('#text-time').text(timeleft)
+
+        if (timeleft === 0 || stopButtonStatus === true) {
+          stopButtonStatus = false
+          clearInterval(timer)
+          $('#btn-start').attr('disabled', false)
+          $('#game img').remove()
+          $('.inf').hide()
+          $('#button-stop').hide()
+          setTimeout(() => {
+
+          }, 50)
+          playing = false
+        } else {
+          // 每秒隨機出現殭屍
+          if (rand(10) > 5) {
+            $("#game").append(`<img src="./images/ghost.png" id="zombie${id}">`);
+            $(`#zombie${id}`).css({
+              right: '0%',
+              bottom: rand(90) + "%"
+            })
+            movezombie(id)
+            id++
+          }
+        }
+
+      }, 1000)
+    })
+
+    $('#btn-stop').click(function () {
+      if (playing === true) {
+        stopButtonStatus = true
+        $('#btn-stop').hide()
+      }
+    })
+
+    $("#game").on('click', 'img', function () {
+      $(this).attr('src', './images/blood.png')
+      $(this).stop(true, false)
+      $(this).css('pointer-events', 'none')
+      score++
+      $('#text-score').text(score)
+    })
+  </script>
+</body>
+
+</html>
